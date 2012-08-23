@@ -1,0 +1,77 @@
+<!DOCTYPE html>  
+<html>
+<head>
+<title>Location Test with Buttons</title>
+<meta http-equiv="X-UA-Compatible" content="IE=9" />
+<script type="text/javascript">
+function setText(val, e) {
+    document.getElementById(e).value = val;
+}
+function insertText(val, e) {
+    document.getElementById(e).value += val;
+}
+var nav = null; 
+var watchID;
+function listenForPosition() {
+  if (nav == null) {
+      nav = window.navigator;
+  }
+  if (nav != null) {
+      var geoloc = nav.geolocation;
+      if (geoloc != null) {
+          watchID = geoloc.watchPosition(successCallback, errorCallback);
+      }
+      else {
+          console.log("Geolocation not supported");
+      }
+  }
+  else {
+      console.log("Navigator not found");
+  }
+}
+function clearWatch(watchID) {
+    window.navigator.geolocation.clearWatch(watchID);
+}
+function successCallback(position)
+{
+    console.log('successCallback');
+   setText(position.coords.latitude, "latitude");
+   setText(position.coords.longitude, "longitude");
+}
+ 
+function errorCallback(error) {
+    var message = "";   
+    // Check for known errors
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            message = "This website does not have permission to use " + 
+                      "the Geolocation API";
+            break;
+        case error.POSITION_UNAVAILABLE:
+            message = "The current position could not be determined.";
+            break;
+        case error.PERMISSION_DENIED_TIMEOUT:
+            message = "The current position could not be determined " + 
+                      "within the specified timeout period.";            
+            break;
+    }
+    // If it's an unknown error, build a message that includes 
+    // information that helps identify the situation so that 
+    // the error handler can be updated.
+    if (message == "")
+    {
+        var strErrorCode = error.code.toString();
+        message = "The position could not be determined due to " + 
+                  "an unknown error (Code: " + strErrorCode + ").";
+    }
+    console.log(message);
+}
+</script>
+</head>
+<body>
+<label for="latitude">Latitude: </label><input id="latitude" /> <br />
+<label for="longitude">Longitude: </label><input id="longitude" /> <br />
+<input type="button" onclick="listenForPosition ()" value="Watch Latitude and Longitude"  /> 
+<input type="button" value="Clear watch" onclick="clearWatch()" />
+</body>
+</html>
